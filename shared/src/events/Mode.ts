@@ -1,14 +1,13 @@
 export class Mode {
-
-    constructor() {
+    private constructor() {
         throw 'Cannot instantiate';
     }
-
-    static get CONTROL() {
+    static get CONTROL(): string {
         return 'control';
     }
-
-    static get PROJECTION() {
+    static get PROJECTION(): string {
         return 'projection';
     }
 }
+
+

@@ -1,28 +1,21 @@
 import { CONFIG } from '../config.js';
 
-let customEvent;
+let customEvent: typeof CustomEvent;
 
 // if not exists CustomEvent, polyfill it
 if (typeof customEvent !== "function") {
   class CustomEvent extends Event {
-
-    /** @type {Object} */
-    #detail;
-
-    constructor(type, options) {
+    #detail: Object;
+    constructor(type: string, options?: CustomEventInit) {
       super(type, options);
       this.#detail = options?.detail ?? null;
     }
-
-    get detail() {
+    get detail(): Object {
       return this.#detail;
     }
-
-    /** @type {string} */
-    static get appID() {
-        return CONFIG.application.id;
+    static get appID(): string {
+      return CONFIG.application.id;
     }
-
   }
   customEvent = CustomEvent;
 } else {
@@ -31,3 +24,4 @@ if (typeof customEvent !== "function") {
 }
 
 export const CustomEvent = customEvent;
+

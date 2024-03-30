@@ -4,20 +4,19 @@ import { CustomEvent } from "./CustomEvent.js";
 import { Participant } from "./Participant.js";
 
 export class Event extends CustomEvent {
-
   /**
    * @type source {Participant}
    * @type target {Participant}
    * @type command {string}
    * @type args {Object}
    */
-  static create(source, target, command, args = {}) {
-    const id = `evt_${cuid()}`;
-    const objectId = `obj_${cuid()}`;
+  static create(source: Participant, target: Participant, command: string, args: Object = {}): Event {
+    const id: string = `evt_${cuid()}`;
+    const objectId: string = `obj_${cuid()}`;
     return new Event(id, source, target, objectId, command, args);
   }
 
-  static of({detail: {id, source, target, objectId, command, args}}) {
+  static of({ detail: { id, source, target, objectId, command, args } }: { detail: { id: string, source: Participant, target: Participant, objectId: string, command: string, args: Object } }): Event {
     return Event.create(
       id,
       Participant.of(source),
@@ -28,7 +27,7 @@ export class Event extends CustomEvent {
     );
   }
 
-  constructor(id, source, target, objectId, command, args = {}) {
+  constructor(id: string, source: Participant, target: Participant, objectId: string, command: string, args: Object = {}) {
     if (!source) {
       throw new Error(`Source is not defined (${source})`);
     }
@@ -46,24 +45,27 @@ export class Event extends CustomEvent {
   /**
    * Event self ID.
    */
-  get eid() {
+  get eid(): string {
     return this.detail.id;
   }
-  get id() {
+
+  get id(): string {
     return this.detail.id;
   }
+
   /**
    * Event Object ID.
    */
-  get oid() {
+  get oid(): string {
     return this.detail.objectId;
   }
-  get objectId() {
+
+  get objectId(): string {
     return this.detail.objectId;
   }
 
   /** @type {string} */
-  get dataId() {
+  get dataId(): string {
     return this.detail.dataId;
   }
 
@@ -73,7 +75,7 @@ export class Event extends CustomEvent {
    * - projection:top.
    * @type {string}
    **/
-  get source() {
+  get source(): string {
     return this.detail.source;
   }
 
@@ -82,29 +84,29 @@ export class Event extends CustomEvent {
    * @see {@link #source}
    * @type {string}
    **/
-  get target() {
+  get target(): string {
     return this.detail.target;
   }
 
   /** @type {string} */
-  get command() {
+  get command(): string {
     return this.detail.command;
   }
 
   /** @type {object} */
-  get args() {
+  get args(): object {
     return this.detail.args;
   }
 
-  with(details) {
+  with(details: object): Event {
     return Event.of(Object.assign(this.toJSON(), details));
   }
 
-  toString() {
+  toString(): string {
     return `#${this.target}.${this.command}(${JSON.stringify(this.args)})`;
   }
 
-  toJSON() {
+  toJSON(): object {
     return {
       id: this.id,
       target: this.target,
@@ -113,7 +115,8 @@ export class Event extends CustomEvent {
     };
   }
 
-  equals(other) {
+  equals(other: Event): boolean {
     return this.id === other.id;
   }
 }
+

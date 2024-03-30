@@ -1,42 +1,27 @@
 import { createLogger, STDOUT } from "../logging.js";
 
 const LOGGER = createLogger(STDOUT);
-
 const EXCLUDED_METHODS = ["constructor", "element", "htmlToNodes"];
 
 export class Handler {
-  /** @type {HTMLElement} */
-  #element;
+  #element: HTMLElement;
   autoplay = false;
-  /**
-   *
-   * @param {HTMLElement} target Target element for this handler instance.
-   */
-  constructor(element) {
+
+  constructor(element: HTMLElement) {
     this.#element = element;
   }
 
-  /**
-   * Return the target element that will be manipulated.
-   */
-  get element() {
+  get element(): HTMLElement {
     return this.#element;
   }
 
-  /**
-   * List supported actions (methods).
-   */
-  get supportedActions() {
+  get supportedActions(): string[] {
     return Object.getOwnPropertyNames(Object.getPrototypeOf(this)).filter(
       (name) => !EXCLUDED_METHODS.includes(name)
     );
   }
 
-  /**
-   * @param {string} html HTML representing any number of sibling elements
-   * @returns {NodeList}
-   */
-  htmlToNodes(html) {
+  htmlToNodes(html: string): NodeList {
     const template = document.createElement("template");
     template.innerHTML = html;
     return template.content.childNodes;
@@ -44,45 +29,34 @@ export class Handler {
 }
 
 export class DefaultHandler extends Handler {
-  constructor(element) {
+  constructor(element: HTMLElement) {
     super(element);
   }
 
-  /**
-   *
-   * @param {{template: string, animate: { cssClass: string}}} args
-   */
-  add = async (event) => {
+  add = async (event: { dataId: string; args: { template: string; animate: { cssClass: string } } }) => {
     const id = event.dataId;
-
     const { template, animate } = event.args;
     for (const node of this.htmlToNodes(template)) {
       node.dataset.id = node.dataset.id || id;
       animate?.cssClass
         ?.split(" ")
         .forEach((cssClass) => node.classList.add(cssClass));
-      // avoid flickering when removing same id node
       setTimeout(() => this.element.appendChild(node), 0);
     }
   };
 
-  /**
-   *
-   * @param {{id: string, animate: { cssClass: string}}, delay: number} args
-   */
-  remove = async (event) => {
+  remove = async (event: { args: { dataId: string | string[]; template?: string; animate: { cssClass: string } }; delay?: number }) => {
     let ids = event.args.dataId || [];
     if (typeof ids === "string") {
       ids = [ids];
     } else if (!ids.length && event.args.template?.includes("data-id")) {
-      ids = this.htmlToNodes(args.template).map((node) => node.dataset.id);
+      ids = Array.from(this.htmlToNodes(event.args.template)).map((node) => node.dataset.id);
     }
     if (!ids.length) {
       throw new Error("Data id (data-id) not provided! Use clear instead.");
     }
-
     const { animate, delay } = event.args;
-    const promises = [];
+    const promises: Promise<void>[] = [];
     for (const id of ids) {
       try {
         const children = this.element.querySelectorAll(`[data-id="${id}"]`);
@@ -106,11 +80,11 @@ export class DefaultHandler extends Handler {
     }
   };
 
-  clear = async (event) => {
+  clear = async (event: { args: { animate: { cssClass: string } }; delay?: number }) => {
     try {
       const animate = event.args.animate;
       const children = this.element.querySelectorAll(`*`);
-      const promises = [];
+      const promises: Promise<void>[] = [];
       for (const child of children) {
         animate?.cssClass
           ?.split(" ")
@@ -130,3 +104,4 @@ export class DefaultHandler extends Handler {
     }
   };
 }
+
