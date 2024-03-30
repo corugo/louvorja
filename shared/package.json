@@ -5,12 +5,20 @@
   "type": "module",
   "main": "src/index.js",
   "scripts": {
+    "clean": "yarn clean:only && yarn",
+    "clean:only": "rimraf dist",
+    "build": "tsc --build src/typescript",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/cuid": "~2.0.1",
+    "@types/ini": "~4.1.0"
+  },
   "dependencies": {
     "cuid": "^2.1.8",
     "ini": "^3.0.1",
-    "pino": "^8.8.0"
+    "pino": "^8.8.0",
+    "typescript": "^5.4.3",
+    "typesync": "^0.12.1"
   }
 }

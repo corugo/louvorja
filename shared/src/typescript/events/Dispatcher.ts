@@ -1,7 +1,6 @@
 import { Event } from "./Event.js";
 import { Handler } from "./Handler.js";
-import { createLogger, STDOUT } from "../logging.js";
-import { CONFIG } from '../config.js';
+import { createLogger, STDOUT } from "logging";
 
 const LOGGER = createLogger(STDOUT);
 export const EVENT_TYPE = "louvorja:event";
